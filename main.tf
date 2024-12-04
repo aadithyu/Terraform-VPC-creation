@@ -1,5 +1,5 @@
 terraform {
-  required_version = "1.7.2"
+  required_version = "1.9.8"
   required_providers {
     aws={
         source = "hashicorp/aws"
@@ -47,7 +47,7 @@ resource "aws_route_table_association" "demo_public_rta" {
     route_table_id = aws_route_table.demo_public_rt.id
 }
 resource "aws_security_group" "demo" {
-    name = "Anand Security Group"
+    name = "new Security Group"
     vpc_id = aws_vpc.demo_vpc.id
     ingress {
         from_port = 80
@@ -75,7 +75,7 @@ resource "aws_security_group" "demo" {
   }
 }
 resource "aws_instance" "demo_ec2" {
-    ami = "ami-0277155c3f0ab2930"
+    ami = "ami-0866a3c8686eaeeba"
     instance_type = "t2.micro"
     vpc_security_group_ids = [aws_security_group.demo.id]
     associate_public_ip_address = true
@@ -84,11 +84,17 @@ resource "aws_instance" "demo_ec2" {
     }
     subnet_id = aws_subnet.demo_public_subnet.id
     user_data = <<-EOF
-    #!/bin/bash
-    sudo yum update -y
-    sudo yum install -y httpd
-    sudo systemctl start httpd
-    sudo systemctl enable httpd
-    echo "<h1>Hello from Terraform</h1>" | sudo tee /var/www/html/index.html
+    #!/bin/sh
+    sudo apt-get upgrade -y
+    sudo apt-get update -y
+    sudo apt-get install apache2 -y
+    sudo systemctl start apache2
+    sudo apt-get install unzip
+    cd /var/www/html/
+    wget https://www.tooplate.com/zip-templates/2136_kool_form_pack.zip
+    unzip 2136_kool_form_pack.zip
+    rm -rf  index.html
+    rm -rf 2136_kool_form_pack.zip
+    mv 2136_kool_form_pack 1
     EOF
 }
